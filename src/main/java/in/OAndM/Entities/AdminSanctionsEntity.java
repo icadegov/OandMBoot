@@ -148,6 +148,12 @@ public class AdminSanctionsEntity {
 	@Column(name = "work_type_id")
 	private Integer workTypeId;
 	
+	@Column(name = "sc_st_funds")
+	private Integer scstFunds;
+	
+	@Column(name = "sc_st_villages")
+	private String scstVillages;
+	
 	@OneToOne(fetch = FetchType.LAZY)
 	 @JoinColumn(name = "approved_by_id", referencedColumnName = "authority_id",insertable=false, updatable=false)
 	  private WorkApprovedAuthorityMst authoritymst ;

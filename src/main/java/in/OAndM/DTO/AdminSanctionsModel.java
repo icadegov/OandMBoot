@@ -106,8 +106,11 @@ public class AdminSanctionsModel {
 	 private String adminFileType;
 	 
 
-	
+	private String scstList; 
 	private String unitName;
+	
+	private String scstVillages;
+	private Integer scstFunds;
 	
 	
 

@@ -31,6 +31,7 @@ import in.OAndM.DTO.AdminSanctionsModel;
 import in.OAndM.DTO.AgreementsModel;
 import in.OAndM.DTO.BillsModel;
 import in.OAndM.DTO.LiftsMasterModel;
+import in.OAndM.DTO.SmallLiftsMasterModel;
 import in.OAndM.DTO.TechnicalSanctionsModel;
 import in.OAndM.DTO.UploadGOsModel;
 import in.OAndM.DTO.WorkApprovedAuthorityModel;
@@ -43,6 +44,7 @@ import in.OAndM.services.AgreementsService;
 import in.OAndM.services.AssignAdminSanctionService;
 import in.OAndM.services.BillsService;
 import in.OAndM.services.LiftMasterService;
+import in.OAndM.services.SmallLiftService;
 import in.OAndM.services.TechnicalSanctionService;
 import in.OAndM.services.UploadGOsService;
 import in.OAndM.services.WorkApprovedAuthorityService;
@@ -82,6 +84,9 @@ public class OAndMController {
 	
 	@Autowired
 	LiftMasterService  liftMasterService;
+	
+	@Autowired
+	SmallLiftService  smallLiftService;
 	
 	@Autowired
 	WorkApprovedAuthorityService workApprovedAuthorityService;
@@ -495,8 +500,8 @@ public class OAndMController {
 	}
 	
 	@GetMapping("/getUserSmallLifts/{unitId}")
-	public ResponseEntity<BaseResponse<HttpStatus, List<LiftsMasterModel>>> getUserSmallLifts(@PathVariable Integer unitId) {
-		BaseResponse<HttpStatus, List<LiftsMasterModel>> response = liftMasterService.findbyProjectId(unitId);
+	public ResponseEntity<BaseResponse<HttpStatus, List<SmallLiftsMasterModel>>> getUserSmallLifts(@PathVariable Integer unitId) {
+		BaseResponse<HttpStatus, List<SmallLiftsMasterModel>> response = smallLiftService.findbyUnitId(unitId);
 		return new ResponseEntity<>(response, response.getStatus());
 	}
 	
@@ -515,9 +520,6 @@ public class OAndMController {
 		 * 
 		 * String formattedDate = formatter.format(date);
 		 */
-		
-	
-		
 		String fileName = admin.getAdminFileUrl().getOriginalFilename().replaceAll("\\s+", "");
 		String[] temps = fileName.split(Pattern.quote("."));
 		BaseResponse<HttpStatus, AdminSanctionsModel> response = new BaseResponse<>();

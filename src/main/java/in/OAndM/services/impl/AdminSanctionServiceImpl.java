@@ -3,15 +3,20 @@ package in.OAndM.services.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import in.OAndM.DTO.AdminSanctionsModel;
+import in.OAndM.DTO.SCSTBenefitedModel;
 import in.OAndM.DTO.TechnicalSanctionsModel;
 import in.OAndM.Entities.AdminSanctionsEntity;
 import in.OAndM.Entities.TechnicalSanctionEntity;
@@ -19,7 +24,9 @@ import in.OAndM.config.AppConstant;
 import in.OAndM.core.BaseResponse;
 import in.OAndM.core.BaseServiceImpl;
 import in.OAndM.repositories.AdminSanctionRepo;
+import in.OAndM.repositories.SCSTBenefitedVillagesRepo;
 import in.OAndM.services.AdminSanctionService;
+import in.OAndM.services.SCSTBenefitedVillagesService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -33,6 +40,9 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 		implements AdminSanctionService {
 	@Autowired
 	AdminSanctionRepo adminSanctionRepo;
+	
+	@Autowired
+	SCSTBenefitedVillagesService scstBenefitedVillagesService;
 	
 
 
@@ -55,8 +65,10 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 		return responseJson;
 
 	}
-	@PersistenceContext
-    private EntityManager entityManager;
+
+	/*
+	 * @PersistenceContext private EntityManager entityManager;
+	 */
 	public BaseResponse<HttpStatus, AdminSanctionsModel> findbyWorkId(Integer workId) {
 		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
 		BaseResponse<HttpStatus, AdminSanctionsModel> responseJson = new BaseResponse<>();
@@ -143,8 +155,8 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 		responseJson.setData(model);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		System.out.println("model in service" + model);
-		System.out.println("responseJson in service" + responseJson.toString());
+//		System.out.println("model in service" + model);
+//		System.out.println("responseJson in service" + responseJson.toString());
 		return responseJson;
 
 	}
@@ -181,15 +193,41 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 	}
 
 	@Override
+	@Transactional
 	public BaseResponse<HttpStatus, AdminSanctionsModel> insertAdminSanctions(AdminSanctionsModel admin) {
 		// TODO Auto-generated method stub
 
 		BaseResponse<HttpStatus, AdminSanctionsModel> responseJson = new BaseResponse<>();
 		Integer workId = adminSanctionRepo.getNextWorkId();
-
+		List<SCSTBenefitedModel> list=new ArrayList<SCSTBenefitedModel>(null);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+		 list = objectMapper.readValue(admin.getScstList(),new TypeReference<List<SCSTBenefitedModel>>() {});
+			for(int i=0;i<list.size();i++) {
+				list.get(i).setWorkId(workId);
+				list.get(i).setUpdatedBy(admin.getUpdatedby());
+			}
+			
+			
+//			System.out.println("list list"+list);
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			responseJson.setMessage("Error in submission");
+			responseJson.setStatus(HttpStatus.BAD_REQUEST);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			responseJson.setMessage("Error in submission");
+			responseJson.setStatus(HttpStatus.BAD_REQUEST);
+		}
+		
 		if (admin != null && workId > 0) {
 			admin.setWorkId(workId);
+			
 			responseJson = create(admin);
+			scstBenefitedVillagesService.insertSCSTBenefitedVillages(list);
 			responseJson.setMessage("Successfully Submitted");
 		} else {
 			logger.debug(appConstant.getValue(AppConstant.CREATE_SERVICE_FAILED));
