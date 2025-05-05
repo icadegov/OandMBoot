@@ -37,7 +37,7 @@ public class UserDetailsDto {
 	    private String postType;
 	    private String workingPlace;
 	    private String workType;
-	    private Long post;
+	    private Long postId;
 	    
 	    private String postFromDate;
 	

@@ -30,7 +30,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/oandm/rti/prfmG")
-
+//@RequestMapping("/oandm/oandm/rti/prfmG")
+//@CrossOrigin(origins = "http://localhost:3002")
 public class RtiProformaGController extends BaseController<RtiProformaG, RtiProformaGDto, Integer> {
 	
 	 private static final Logger logger = LoggerFactory.getLogger(RTIController.class);
@@ -256,13 +257,13 @@ public ResponseEntity<BaseResponse<HttpStatus, List<UnitLevelDataDto>>> getDivis
     if ( rtiProformaGDto.getSelectedUnitId()!= null) {
     	clickedUnitId  =  rtiProformaGDto.getSelectedUnitId();
     	java.lang.System.out.println("Received clickedUnitId : " + clickedUnitId);
-    rtiProformaGDto.getUser().setUnitId(clickedUnitId);
+   // rtiProformaGDto.getUser().setUnitId(clickedUnitId);
     }
     
     if ( rtiProformaGDto.getSelectedCircleId()!= null) {
     	clickedCircleId  =  rtiProformaGDto.getSelectedCircleId();
     	java.lang.System.out.println("Received clickedCircleId : " + clickedCircleId);
-    rtiProformaGDto.getUser().setCircleId(clickedCircleId);
+   // rtiProformaGDto.getUser().setCircleId(clickedCircleId);
     }
    // System.out.println("Received divisionConsolidated rtiApplicationDto details: " + rtiApplicationDto.getYear() + rtiApplicationDto.getQuarter());
     if (rtiProformaGDto.getUser() == null) {
@@ -281,7 +282,7 @@ public ResponseEntity<BaseResponse<HttpStatus, List<UnitLevelDataDto>>> getDivis
      
 
     // Call the service layer to fetch data  getrtiAppnConsolidatedProformaC
-    BaseResponse<HttpStatus, List<UnitLevelDataDto>> response = rtiProformaGService.getrtiDivisionAppealConsolidatedProformaG(user,year,quarter,circles,divisions);
+    BaseResponse<HttpStatus, List<UnitLevelDataDto>> response = rtiProformaGService.getrtiDivisionAppealConsolidatedProformaG(user,year,quarter,circles,divisions,clickedUnitId,clickedCircleId);
     java.lang.System.out.println("response " + response);
     // Return the response with HTTP status
     return new ResponseEntity<>(response, HttpStatus.OK);

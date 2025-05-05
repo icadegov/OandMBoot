@@ -116,7 +116,7 @@ public class RtiApplicationMapper implements BaseMapper<RTIApplication, RtiAppli
             entity.setDivision(model.getUser().getDivisionId());
             entity.setSubDivision(model.getUser().getSubDivisionId());
             entity.setDesignation(model.getUser().getDesignationId());
-            entity.setCreatedPostId(model.getUser().getPost());
+            entity.setCreatedPostId(model.getUser().getPostId());
            // System.out.println("user not null in G Dto 2"+ model.getUser().getPost());
             entity.setCreatedBy(model.getUser().getUsername());
         }

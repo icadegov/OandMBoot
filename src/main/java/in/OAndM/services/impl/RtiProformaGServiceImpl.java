@@ -416,10 +416,16 @@ public class RtiProformaGServiceImpl implements RtiProformaGService {
         List<Map<String, Object>> rawData = rtiProformaGRepository.getRTIAppealEditList(divId,circleId,unitId,fdate,date);
         System.out.println("rawData "+rawData);
 
-       
+        if (rawData == null || rawData.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND);
+            response.setMessage("No records found to display");
+            response.setData(null);
+            return response;
+        }
       	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
       	
-       List<RtiProformaGDto> rtiEdit=new ArrayList<>(); 
+       List<RtiProformaGDto> rtiEdit=new ArrayList<>();
+       if(rawData.size()>0) {
        for(int i=0;i<rawData.size();i++) {
     	   RtiProformaGDto dto = new RtiProformaGDto();  
     	   
@@ -478,7 +484,7 @@ public class RtiProformaGServiceImpl implements RtiProformaGService {
        response.setMessage("Rti Appeal edit data List retrieved successfully.");
        response.setData(rtiEdit);
        response.setSuccess(true);
-   } catch (IllegalArgumentException e) {
+   } }catch (IllegalArgumentException e) {
        log.error("Validation error: {}", e.getMessage());
        response.setStatus(HttpStatus.BAD_REQUEST);
        response.setMessage(e.getMessage());
@@ -836,7 +842,7 @@ public class RtiProformaGServiceImpl implements RtiProformaGService {
    @Override
 	public BaseResponse<HttpStatus, List<UnitLevelDataDto>> getrtiDivisionAppealConsolidatedProformaG(
 	        UserDetailsDto u, Integer year, Integer quarter, List<CircleListForUnitId> circles, 
-	        List<DivisionListForCircleId> divisions) {
+	        List<DivisionListForCircleId> divisions,Integer clickedUnitId, Integer clickedCircleId) {
 	    
 	    BaseResponse<HttpStatus, List<UnitLevelDataDto>> response = new BaseResponse<>();
 	    
@@ -862,6 +868,8 @@ public class RtiProformaGServiceImpl implements RtiProformaGService {
 	                rawData = rtiProformaGRepository.getrtiAppealDivisionUCDConsolidatedPrfmG(year, quarter, timestamp, unit, circle, division);
 	            }
 	        } else {
+	        	unit=clickedUnitId;
+	        	  circle=clickedCircleId;
 	            rawData = rtiProformaGRepository.getrtiAppealDivisionUCConsolidatedPrfmG(year, quarter, timestamp, unit, circle);
 	        }
 	        

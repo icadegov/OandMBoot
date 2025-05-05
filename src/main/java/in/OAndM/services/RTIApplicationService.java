@@ -33,8 +33,18 @@ public interface RTIApplicationService extends BaseService<RtiApplicationDto, In
 			Integer quarter);
 
 	BaseResponse<HttpStatus, List<UnitLevelDataDto>> getrtiAppnDivisionConsolidatedProformaC(UserDetailsDto user,
-			Integer year, Integer quarter, List<CircleListForUnitId> circles, List<DivisionListForCircleId> divisions);
+			Integer year, Integer quarter, List<CircleListForUnitId> circles, List<DivisionListForCircleId> divisions, 
+			Integer clickedUnitId, Integer clickedCircleId);
 
 	BaseResponse<HttpStatus, List<UnitLevelDataDto>> getrtiAppnCircleConsolidatedProformaC(UserDetailsDto user,
 			Integer year, Integer quarter, List<CircleListForUnitId> circles, List<DivisionListForCircleId> divisions);
+
+	BaseResponse<HttpStatus, List<UnitLevelDataDto>> getrtiAppnDivDashboard(UserDetailsDto user, Integer year,
+			Integer quarter);
+
+	BaseResponse<HttpStatus, List<UnitLevelDataDto>> getrtiAppnDseDashboard(UserDetailsDto user, Integer year,
+			Integer quarter);
+
+	BaseResponse<HttpStatus, List<UnitLevelDataDto>> getrtiAppnCEDashboard(UserDetailsDto user, Integer year,
+			Integer quarter);
 }

@@ -37,7 +37,7 @@ public interface RtiProformaGService extends BaseService<RtiProformaGDto, Intege
 			Integer quarter);
 
 	BaseResponse<HttpStatus, List<UnitLevelDataDto>> getrtiDivisionAppealConsolidatedProformaG(UserDetailsDto user,
-			Integer year, Integer quarter, List<CircleListForUnitId> circles, List<DivisionListForCircleId> divisions);
+			Integer year, Integer quarter, List<CircleListForUnitId> circles, List<DivisionListForCircleId> divisions, Integer clickedUnitId, Integer clickedCircleId);
 
 	BaseResponse<HttpStatus, List<UnitLevelDataDto>> getUnitLevelData(UserDetailsDto user, Integer year,
 			Integer quarter);

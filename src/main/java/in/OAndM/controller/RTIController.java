@@ -24,8 +24,11 @@ import java.time.temporal.IsoFields;
 import java.util.List;
 
 @RestController
-@RequestMapping("/oandm/rti/app")
+//for server
+@RequestMapping("/oandm/rti/app") 
+//@RequestMapping("/oandm/oandm/rti/app")
 
+//@CrossOrigin(origins = "http://localhost:3002")
 public class RTIController extends BaseController<RTIApplication, RtiApplicationDto, Integer> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RTIController.class);
@@ -45,7 +48,7 @@ public class RTIController extends BaseController<RTIApplication, RtiApplication
     public ResponseEntity<BaseResponse<HttpStatus, List<RtiApplicationDto>>> getAllEditApplications(@Valid @RequestBody UserDetailsDto user) {
     LocalDate myLocal = LocalDate.now();
     System.out.println("Received user details: " + user);
-	LocalDate previousQuarter = myLocal.minus(1, IsoFields.QUARTER_YEARS);
+	LocalDate previousQuarter = myLocal.minus(2, IsoFields.QUARTER_YEARS);
 	long lastDayOfQuarter = IsoFields.DAY_OF_QUARTER.rangeRefinedBy(previousQuarter).getMaximum();
 	LocalDate lastDayInPreviousQuarter = previousQuarter.with(IsoFields.DAY_OF_QUARTER, lastDayOfQuarter);
 	 System.out.println("last "+lastDayInPreviousQuarter);
@@ -114,6 +117,46 @@ public class RTIController extends BaseController<RTIApplication, RtiApplication
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
+    @PostMapping("/getCYrQtrDashboardReport")
+    public ResponseEntity<BaseResponse<HttpStatus, List<UnitLevelDataDto>>> getDashboardData(
+            @RequestBody RtiApplicationDto rtiApplicationDto) {
+
+        Integer year = rtiApplicationDto.getYear();
+        Integer quarter = rtiApplicationDto.getQuarter();
+        logger.info("Received year: {}, quarter: {}", year, quarter);
+
+        UserDetailsDto user = rtiApplicationDto.getUser();
+        if (user == null) {
+            logger.error("User details are null in the request payload: {}", rtiApplicationDto);
+            throw new IllegalArgumentException("User details are null");
+        }
+        logger.info("Received user details: {}", user);
+
+        Integer unit = user.getUnitId();
+        Integer desgId = user.getDesignationId();
+        logger.info("User designationId: {}", desgId);
+
+        BaseResponse<HttpStatus, List<UnitLevelDataDto>> response = null;
+
+        if (unit != 4) {
+            if (desgId == 5 && user.getCircleId() != 0) {
+                response = rtiApplicationService.getrtiAppnDivDashboard(user, year, quarter);
+            } else if (desgId == 7) {
+                response = rtiApplicationService.getrtiAppnDseDashboard(user, year, quarter);
+            } else if (desgId == 9 || desgId == 10) {
+                response = rtiApplicationService.getrtiAppnCEDashboard(user, year, quarter);
+            }
+        }
+
+        if (response == null) {
+            logger.warn("No dashboard data found for given user and parameters.");
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    
     @PostMapping("/circleConsolidated")
     public ResponseEntity<BaseResponse<HttpStatus, List<UnitLevelDataDto>>> getCircleLevelData(
     		@RequestBody RtiApplicationDto rtiApplicationDto ) {
@@ -163,13 +206,13 @@ public class RTIController extends BaseController<RTIApplication, RtiApplication
         if ( rtiApplicationDto.getSelectedUnitId()!= null) {
         	clickedUnitId  =  rtiApplicationDto.getSelectedUnitId();
         System.out.println("Received clickedUnitId : " + clickedUnitId);
-        rtiApplicationDto.getUser().setUnitId(clickedUnitId);
+      //  rtiApplicationDto.getUser().setUnitId(clickedUnitId);
         }
         
         if ( rtiApplicationDto.getSelectedCircleId()!= null) {
         	clickedCircleId  =  rtiApplicationDto.getSelectedCircleId();
         System.out.println("Received clickedCircleId : " + clickedCircleId);
-        rtiApplicationDto.getUser().setCircleId(clickedCircleId);
+      //  rtiApplicationDto.getUser().setCircleId(clickedCircleId);
         }
        // System.out.println("Received divisionConsolidated rtiApplicationDto details: " + rtiApplicationDto.getYear() + rtiApplicationDto.getQuarter());
         if (rtiApplicationDto.getUser() == null) {
@@ -188,7 +231,7 @@ public class RTIController extends BaseController<RTIApplication, RtiApplication
          
 
         // Call the service layer to fetch data  getrtiAppnConsolidatedProformaC
-        BaseResponse<HttpStatus, List<UnitLevelDataDto>> response = rtiApplicationService.getrtiAppnDivisionConsolidatedProformaC(user,year,quarter,circles,divisions);
+        BaseResponse<HttpStatus, List<UnitLevelDataDto>> response = rtiApplicationService.getrtiAppnDivisionConsolidatedProformaC(user,year,quarter,circles,divisions,clickedUnitId,clickedCircleId);
         System.out.println("response " + response);
         // Return the response with HTTP status
         return new ResponseEntity<>(response, HttpStatus.OK);

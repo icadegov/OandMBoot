@@ -110,7 +110,7 @@ public class RtiProformaGMapper implements BaseMapper<RtiProformaG, RtiProformaG
             entity.setCircle(model.getUser().getCircleId());
             entity.setDivision(model.getUser().getDivisionId());
             entity.setSubDivision(model.getUser().getSubDivisionId());
-            entity.setPost(model.getUser().getPost());
+            entity.setPost(model.getUser().getPostId());
             entity.setCreatedBy(model.getUser().getUsername());
         }
         if (model.getUser() == null) {
@@ -181,7 +181,7 @@ public class RtiProformaGMapper implements BaseMapper<RtiProformaG, RtiProformaG
             entity.setCircle(model.getUser().getCircleId());
             entity.setDivision(model.getUser().getDivisionId());
             entity.setSubDivision(model.getUser().getSubDivisionId());
-            entity.setPost(model.getUser().getPost());
+            entity.setPost(model.getUser().getPostId());
             entity.setCreatedBy(model.getUser().getUsername());
         }
                 if (model.getUser() == null) {
