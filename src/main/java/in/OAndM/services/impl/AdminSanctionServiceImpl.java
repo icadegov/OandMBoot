@@ -14,7 +14,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import in.OAndM.DTO.AdminSanctionsModel;
 import in.OAndM.DTO.SCSTBenefitedModel;
 import in.OAndM.DTO.TechnicalSanctionsModel;
@@ -31,8 +30,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
-
-
 @Service
 @Transactional
 
@@ -40,11 +37,9 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 		implements AdminSanctionService {
 	@Autowired
 	AdminSanctionRepo adminSanctionRepo;
-	
+
 	@Autowired
 	SCSTBenefitedVillagesService scstBenefitedVillagesService;
-	
-
 
 	private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
@@ -53,15 +48,22 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 
 		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
 		BaseResponse<HttpStatus, List<AdminSanctionsModel>> responseJson = new BaseResponse<>();
-		List<AdminSanctionsEntity> entities = adminSanctionRepo
-				.findByunitIdAndFinancialYearAndIsLatestAndDeleteFlag(unit, year, true, false);
-		List<AdminSanctionsModel> models = mapper.mapEntityToModel(entities);
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setSuccess(true);
-		responseJson.setData(models);
+		try {
+			List<AdminSanctionsEntity> entities = adminSanctionRepo
+					.findByunitIdAndFinancialYearAndIsLatestAndDeleteFlag(unit, year, true, false);
+			List<AdminSanctionsModel> models = mapper.mapEntityToModel(entities);
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setSuccess(true);
+			responseJson.setData(models);
 
-		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setStatus(HttpStatus.OK);
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setStatus(HttpStatus.OK);
+		} catch (Exception e) {
+			responseJson.setSuccess(false);
+			logger.debug(appConstant.getValue(AppConstant.CREATE_SERVICE_FAILED));
+			responseJson.setStatus(HttpStatus.BAD_GATEWAY);
+			responseJson.setMessage(appConstant.getValue(AppConstant.CREATE_SERVICE_FAILED));
+		}
 		return responseJson;
 
 	}
@@ -70,58 +72,35 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 	 * @PersistenceContext private EntityManager entityManager;
 	 */
 	public BaseResponse<HttpStatus, AdminSanctionsModel> findbyWorkId(Integer workId) {
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
+
 		BaseResponse<HttpStatus, AdminSanctionsModel> responseJson = new BaseResponse<>();
-		AdminSanctionsEntity entities = adminSanctionRepo
-				.findByworkIdAndIsLatestAndDeleteFlag(workId, true,
-						false);
-		AdminSanctionsModel models =new AdminSanctionsModel();
-		if(entities!=null) {
-			models= mapper.mapEntityToModel(entities);
-		List<TechnicalSanctionsModel> techSanctionModels = new ArrayList<>();
-		for (int i=0;i<entities.getTechnEntries().size();i++) {
-			TechnicalSanctionsModel techmodel = new TechnicalSanctionsModel();
-			techmodel.setTsApprovedAmount(entities.getTechnEntries().get(i).getTsApprovedAmount());
-			techmodel.setTsApprovedDate(entities.getTechnEntries().get(i).getTsApprovedDate());
-			techmodel.setTsDate(entities.getTechnEntries().get(i).getTsApprovedDate().toString());
-			techmodel.setTsNumber(entities.getTechnEntries().get(i).getTsNumber());
-		techSanctionModels.add(techmodel);
+		try {
+			AdminSanctionsEntity entities = adminSanctionRepo.findByworkIdAndIsLatestAndDeleteFlag(workId, true, false);
+			AdminSanctionsModel models = new AdminSanctionsModel();
+			if (entities != null) {
+				models = mapper.mapEntityToModel(entities);
+				List<TechnicalSanctionsModel> techSanctionModels = new ArrayList<>();
+				for (int i = 0; i < entities.getTechnEntries().size(); i++) {
+					TechnicalSanctionsModel techmodel = new TechnicalSanctionsModel();
+					techmodel.setTsApprovedAmount(entities.getTechnEntries().get(i).getTsApprovedAmount());
+					techmodel.setTsApprovedDate(entities.getTechnEntries().get(i).getTsApprovedDate());
+					techmodel.setTsDate(entities.getTechnEntries().get(i).getTsApprovedDate().toString());
+					techmodel.setTsNumber(entities.getTechnEntries().get(i).getTsNumber());
+					techSanctionModels.add(techmodel);
+				}
+				models.setTechlist(techSanctionModels);
+			}
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setSuccess(true);
+			responseJson.setData(models);
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setStatus(HttpStatus.OK);
+		} catch (Exception e) {
+			responseJson.setSuccess(false);
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setStatus(HttpStatus.BAD_GATEWAY);
 		}
-		models.setTechlist(techSanctionModels);
-		}
-		
-		
-
-		
-//		AdminSanctionsModel model = new AdminSanctionsModel();
-//		model.setWorkId(entities.getWorkId());
-//		model.setAdminSanctionAmt(entities.getAdminSanctionAmt());
-//		model.setWorkName(entities.getWorkName());
-//		model.setAaFileUrl(entities.getAaFileUrl());
-//		model.setApprovedById(entities.getApprovedById());
-//		model.setApprovedByName(entities.getAuthoritymst().getAuthorityName());
-//		model.setHoaId(entities.getHoaId());
-//		model.setWorkTypeId(entities.getWorkTypeId());
-//		model.setFinancialYear(entities.getFinancialYear());
-//		model.setReferenceNumber(entities.getReferenceNumber());
-//		model.setReferenceDate(entities.getReferenceDate());
-//		List<TechnicalSanctionsModel> techSanctionModels = new ArrayList<>();
-//		for (TechnicalSanctionEntity tech : entities.getTechnEntries()) {
-//			TechnicalSanctionsModel techmodel = new TechnicalSanctionsModel();
-//			techmodel.setTsApprovedAmount(tech.getTsApprovedAmount());
-//			techmodel.setTsApprovedDate(tech.getTsApprovedDate());
-//			techmodel.setTsDate(tech.getTsApprovedDate().toString());
-//			techmodel.setTsNumber(tech.getTsNumber());
-//			techSanctionModels.add(techmodel);
-//		}
-//		model.setTechlist(techSanctionModels);
-//	AdminSanctionsModel model = mapper.mapEntityToModel(entities);
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setSuccess(true);
-		responseJson.setData(models);
-
-		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setStatus(HttpStatus.OK);
 
 		return responseJson;
 
@@ -130,63 +109,69 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 	public BaseResponse<HttpStatus, AdminSanctionsModel> findByunitIdAndFinancialYearAndIsLatestAndDeleteFlagAndTechnEntriesIsLatestAndTechnEntriesTsId(
 			Integer unit, Integer finyear, Boolean isLatest, Boolean deleteFlag, Boolean tech_is_latest, Integer tsId) {
 
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
 		BaseResponse<HttpStatus, AdminSanctionsModel> responseJson = new BaseResponse<>();
-		AdminSanctionsEntity entities = adminSanctionRepo
-				.findByunitIdAndFinancialYearAndIsLatestAndDeleteFlagAndTechnEntriesIsLatestAndTechnEntriesTsId(unit,
-						finyear, true, false, true, tsId);
-		AdminSanctionsModel model = new AdminSanctionsModel();
-		model.setWorkId(entities.getWorkId());
-		List<TechnicalSanctionsModel> techSanctionModels = new ArrayList<>();
-		for (TechnicalSanctionEntity tech : entities.getTechnEntries()) {
+		try {
+			AdminSanctionsEntity entities = adminSanctionRepo
+					.findByunitIdAndFinancialYearAndIsLatestAndDeleteFlagAndTechnEntriesIsLatestAndTechnEntriesTsId(
+							unit, finyear, true, false, true, tsId);
+			AdminSanctionsModel model = new AdminSanctionsModel();
+			model.setWorkId(entities.getWorkId());
+			List<TechnicalSanctionsModel> techSanctionModels = new ArrayList<>();
+			for (TechnicalSanctionEntity tech : entities.getTechnEntries()) {
 
-			TechnicalSanctionsModel techmodel = new TechnicalSanctionsModel();
-			techmodel.setTsApprovedAmount(tech.getTsApprovedAmount());
-			techmodel.setTsApprovedDate(tech.getTsApprovedDate());
-			techmodel.setTsNumber(tech.getTsNumber());
-			techSanctionModels.add(techmodel);
+				TechnicalSanctionsModel techmodel = new TechnicalSanctionsModel();
+				techmodel.setTsApprovedAmount(tech.getTsApprovedAmount());
+				techmodel.setTsApprovedDate(tech.getTsApprovedDate());
+				techmodel.setTsNumber(tech.getTsNumber());
+				techSanctionModels.add(techmodel);
+			}
+			model.setTechlist(techSanctionModels);
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setSuccess(true);
+			responseJson.setData(model);
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setStatus(HttpStatus.OK);
+		} catch (Exception e) {
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setSuccess(false);
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setStatus(HttpStatus.BAD_GATEWAY);
 		}
-		model.setTechlist(techSanctionModels);
 
-//	AdminSanctionsModel model = mapper.mapEntityToModel(entities);
-
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setSuccess(true);
-		responseJson.setData(model);
-		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setStatus(HttpStatus.OK);
-//		System.out.println("model in service" + model);
-//		System.out.println("responseJson in service" + responseJson.toString());
 		return responseJson;
 
 	}
-	
-
 
 	public BaseResponse<HttpStatus, List<AdminSanctionsModel>> getAdminSanctionForDEE(Integer unit, Integer circle,
 			Integer divisionId, Integer subDivisionId, Integer year) {
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
+
 		BaseResponse<HttpStatus, List<AdminSanctionsModel>> responseJson = new BaseResponse<>();
-		
-		
-		List<AdminSanctionsEntity> entities = adminSanctionRepo
-				.findByunitIdAndFinancialYearAndIsLatestAndDeleteFlagAndCircleIdAndDivisionIdAndSubDivisionIdAndIsAssignedTrue(
-						unit, year, true, false, circle, divisionId, subDivisionId);
-	
 
-		List<AdminSanctionsModel> adminmodels = new ArrayList<>();
-		for (AdminSanctionsEntity admin : entities) {
-			AdminSanctionsModel model = new AdminSanctionsModel();
-			model.setWorkId(admin.getWorkId());
-			model.setWorkName(admin.getWorkName());
+		try {
+			List<AdminSanctionsEntity> entities = adminSanctionRepo
+					.findByunitIdAndFinancialYearAndIsLatestAndDeleteFlagAndCircleIdAndDivisionIdAndSubDivisionIdAndIsAssignedTrue(
+							unit, year, true, false, circle, divisionId, subDivisionId);
 
-			adminmodels.add(model);
+			List<AdminSanctionsModel> adminmodels = new ArrayList<>();
+			for (AdminSanctionsEntity admin : entities) {
+				AdminSanctionsModel model = new AdminSanctionsModel();
+				model.setWorkId(admin.getWorkId());
+				model.setWorkName(admin.getWorkName());
+
+				adminmodels.add(model);
+			}
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setSuccess(true);
+			responseJson.setData(adminmodels);
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setStatus(HttpStatus.OK);
+		} catch (Exception e) {
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setSuccess(false);
+
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setStatus(HttpStatus.BAD_GATEWAY);
 		}
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setSuccess(true);
-		responseJson.setData(adminmodels);
-		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setStatus(HttpStatus.OK);
 
 		return responseJson;
 
@@ -199,17 +184,17 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 
 		BaseResponse<HttpStatus, AdminSanctionsModel> responseJson = new BaseResponse<>();
 		Integer workId = adminSanctionRepo.getNextWorkId();
-		List<SCSTBenefitedModel> list=new ArrayList<SCSTBenefitedModel>(null);
-		
+		List<SCSTBenefitedModel> list = new ArrayList<SCSTBenefitedModel>(null);
+
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-		 list = objectMapper.readValue(admin.getScstList(),new TypeReference<List<SCSTBenefitedModel>>() {});
-			for(int i=0;i<list.size();i++) {
+			list = objectMapper.readValue(admin.getScstList(), new TypeReference<List<SCSTBenefitedModel>>() {
+			});
+			for (int i = 0; i < list.size(); i++) {
 				list.get(i).setWorkId(workId);
 				list.get(i).setUpdatedBy(admin.getUpdatedby());
 			}
-			
-			
+
 //			System.out.println("list list"+list);
 		} catch (JsonMappingException e) {
 			// TODO Auto-generated catch block
@@ -222,10 +207,10 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 			responseJson.setMessage("Error in submission");
 			responseJson.setStatus(HttpStatus.BAD_REQUEST);
 		}
-		
+
 		if (admin != null && workId > 0) {
 			admin.setWorkId(workId);
-			
+
 			responseJson = create(admin);
 			scstBenefitedVillagesService.insertSCSTBenefitedVillages(list);
 			responseJson.setMessage("Successfully Submitted");
@@ -241,7 +226,6 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 	public BaseResponse<HttpStatus, List<AdminSanctionsModel>> getAdminSanctionByUserByAuthorityByFinyear(Integer unit,
 			Integer circle, Integer division, Integer subdivision, Integer approvedId, Integer finyear) {
 		// TODO Auto-generated method stub
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
 
 		BaseResponse<HttpStatus, List<AdminSanctionsModel>> responseJson = new BaseResponse<>();
 		try {
@@ -256,8 +240,8 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 			responseJson.setStatus(HttpStatus.OK);
 		} catch (Exception e) {
+			logger.debug(appConstant.getValue(AppConstant.CREATE_SERVICE_FAILED));
 			responseJson.setSuccess(false);
-			// responseJson.setData("");
 			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
 			responseJson.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -268,27 +252,26 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 	@Override
 	public BaseResponse<HttpStatus, List<AdminSanctionsModel>> getAdminSanctions(Integer unit, Integer year) {
 		// TODO Auto-generated method stub
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
-		BaseResponse<HttpStatus, List<AdminSanctionsModel>> responseJson = new BaseResponse<>();
-		List<AdminSanctionsEntity> entities = adminSanctionRepo
-				.findByunitIdAndFinancialYearAndIsLatestTrueAndDeleteFlagFalseAndIsAssignedTrue(
-						unit, year);
-	//	List<AdminSanctionsModel> adminmodels = new ArrayList<>();
-		
-		List<AdminSanctionsModel> models = mapper.mapEntityToModel(entities);
-//		for (AdminSanctionsEntity admin : entities) {
-//			AdminSanctionsModel model = new AdminSanctionsModel();
-//			model.setWorkId(admin.getWorkId());
-//			model.setWorkName(admin.getWorkName());
-//
-//			adminmodels.add(model);
-//		}
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setSuccess(true);
-		responseJson.setData(models);
-		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
-		responseJson.setStatus(HttpStatus.OK);
 
+		BaseResponse<HttpStatus, List<AdminSanctionsModel>> responseJson = new BaseResponse<>();
+		try {
+			List<AdminSanctionsEntity> entities = adminSanctionRepo
+					.findByunitIdAndFinancialYearAndIsLatestTrueAndDeleteFlagFalseAndIsAssignedTrue(unit, year);
+
+			List<AdminSanctionsModel> models = mapper.mapEntityToModel(entities);
+
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setSuccess(true);
+			responseJson.setData(models);
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+			responseJson.setStatus(HttpStatus.OK);
+		} catch (Exception e) {
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setSuccess(false);
+
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setStatus(HttpStatus.BAD_GATEWAY);
+		}
 		return responseJson;
 
 	}
@@ -297,27 +280,34 @@ public class AdminSanctionServiceImpl extends BaseServiceImpl<AdminSanctionsEnti
 	public BaseResponse<HttpStatus, List<AdminSanctionsModel>> getUnAssignedAdminSanctions(Integer unit, Integer circle,
 			Integer division, Integer subDivision) {
 		// TODO Auto-generated method stub
-		
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
+
 		BaseResponse<HttpStatus, List<AdminSanctionsModel>> responseJson = new BaseResponse<>();
-		List<AdminSanctionsEntity> entities = adminSanctionRepo.findByUnitIdAndCircleIdAndDivisionIdAndSubDivisionIdAndIsAssignedFalseAndIsLatestTrueAndDeleteFlagFalse(unit, circle, division, subDivision);
-		
+		try {
+		List<AdminSanctionsEntity> entities = adminSanctionRepo
+				.findByUnitIdAndCircleIdAndDivisionIdAndSubDivisionIdAndIsAssignedFalseAndIsLatestTrueAndDeleteFlagFalse(
+						unit, circle, division, subDivision);
+
 		List<AdminSanctionsModel> models = mapper.mapEntityToModel(entities);
-		
+
 		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setSuccess(true);
 		responseJson.setData(models);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
+		}
+		catch(Exception e) {
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setSuccess(false);
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setStatus(HttpStatus.BAD_GATEWAY);
+		}
 		return responseJson;
 	}
 
-
-	 
 	@Override
 	public BaseResponse<HttpStatus, AdminSanctionsModel> getcircle(Integer unitId) {
 		// TODO Auto-generated method stub
-		
+
 		return null;
 	}
 }
