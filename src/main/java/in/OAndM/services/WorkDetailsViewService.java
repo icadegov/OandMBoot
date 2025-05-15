@@ -30,4 +30,5 @@ public interface WorkDetailsViewService  {
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getOMWorksSanctionTSAgmtBillsDetailedReport(Integer unitId,Integer approvedById,Integer scstFunds,Integer financialYear,Integer hoaId,Integer workTypeId,Integer ProjSubType,Integer projectId,Integer type);
 	
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getWorkOverViewReport(Integer unitId,Integer circleId,Integer divisionId,Integer subDivisionId);
+	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsReportProjectUnitWise(Integer finyear, Integer projectId);
 }

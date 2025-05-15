@@ -34,147 +34,151 @@ import jakarta.transaction.Transactional;
 @Service
 @Transactional
 
-public class WorkDetailsViewServiceImpl extends BaseServiceImpl<WorkDetailsViewEntity, WorkDetailsViewModel, Integer> implements WorkDetailsViewService {
-	
+public class WorkDetailsViewServiceImpl extends BaseServiceImpl<WorkDetailsViewEntity, WorkDetailsViewModel, Integer>
+		implements WorkDetailsViewService {
+
 	@Autowired
 	WorkDetailsViewRepo workdetailsrepo;
-	
-	private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
-	
-	@Autowired
-	protected BaseMapper<TechnicalSanctionEntity, TechnicalSanctionsModel>  techMapper;
 
-	
+	private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
+
+	@Autowired
+	protected BaseMapper<TechnicalSanctionEntity, TechnicalSanctionsModel> techMapper;
+
 	@Override
-	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsRepSanctionAuthorityWiseByFinyear(Integer finYear,Integer unit,Integer circle,Integer division,Integer subDivision,Integer designationId) {
+	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsRepSanctionAuthorityWiseByFinyear(Integer finYear,
+			Integer unit, Integer circle, Integer division, Integer subDivision, Integer designationId) {
 		// TODO Auto-generated method stub
-		
+
 		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
 		List<WorkDetailsViewModel> list;
+		String type = null;
 
-		if(designationId==4 || designationId==113 ) {
-			list=workdetailsrepo.getAbsRepSanctionAuthorityWiseDEE(finYear, unit, circle, division, subDivision);
-			} else if (designationId==5 || designationId==114) {
-				/* for EE */
-				list=workdetailsrepo.getAbsRepSanctionAuthorityWiseEE(finYear, unit, circle,division);
-			}
-			 else if (designationId==7) {
-					/* for SE */
-				 list=workdetailsrepo.getAbsRepSanctionAuthorityWiseSE(finYear, unit, circle);
-				}
-			 else if (designationId==9 || designationId==10) {
-					/* for CE */
-				 list=workdetailsrepo.getAbsRepSanctionAuthorityWiseCE(finYear, unit);
-				}
-			 else {
-				 list=workdetailsrepo.getAbsRepSanctionAuthorityWiseByFinyear(finYear);
-			 }
-	
+		if (designationId == 4 || designationId == 113) {
+
+			type = "dee";
+		} else if (designationId == 5 || designationId == 114) {
+			/* for EE */
+
+			type = "ee";
+		} else if (designationId == 7) {
+			/* for SE */
+
+			type = "se";
+		} else if (designationId == 9 || designationId == 10) {
+			/* for CE */
+
+			type = "ce";
+		} else {
+
+			type = "enc";
+		}
+
+		list = workdetailsrepo.getAbsRepSanctionAuthorityWiseByFinyear(finYear, unit, circle, division, subDivision,
+				type);
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
-
 
 	@Override
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsRepUnitWiseFinyear(Integer finyear) {
 		// TODO Auto-generated method stub
-			BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
-		
+		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
+
 		List<WorkDetailsViewModel> list = null;
-		
-		if(finyear > 0) {
-			 list=workdetailsrepo.getAbsRepUnitWiseFinyear(finyear);
+
+		if (finyear > 0) {
+			list = workdetailsrepo.getAbsRepUnitWiseFinyear(finyear);
 		}
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
-
 
 	@Override
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsRepWorkTypeHOAWiseFinyear(Integer finyear) {
 		// TODO Auto-generated method stub
 		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
-		
+
 		List<WorkDetailsViewModel> list = null;
-		
-		if(finyear > 0) {
-			 list=workdetailsrepo.getAbsRepWorkTypeHOAWiseFinyear(finyear);
+
+		if (finyear > 0) {
+			list = workdetailsrepo.getAbsRepWorkTypeHOAWiseFinyear(finyear);
 		}
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
-
 
 	@Override
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsRepWorkTypeWiseFinyear(Integer finyear) {
 		// TODO Auto-generated method stub
 		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
-		
+
 		List<WorkDetailsViewModel> list = null;
-		
-		if(finyear > 0) {
-			 list=workdetailsrepo.getAbsRepWorkTypeWiseFinyear(finyear);
+
+		if (finyear > 0) {
+			list = workdetailsrepo.getAbsRepWorkTypeWiseFinyear(finyear);
 		}
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
-
 
 	@Override
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsRepSanctionAuthWorkTypeWiseFinyear(
 			Integer finyear) {
 		// TODO Auto-generated method stub
-BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
-		
+		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
+
 		List<WorkDetailsViewModel> list = null;
-		
-		if(finyear > 0) {
-			 list=workdetailsrepo.getAbsRepSanctionAuthWorkTypeWiseFinyear(finyear);
+
+		if (finyear > 0) {
+			list = workdetailsrepo.getAbsRepSanctionAuthWorkTypeWiseFinyear(finyear);
 		}
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
 
-
 	@Override
-	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getOMWorksTSAgmtBillsDetailedReport(Integer unitId,Integer approvedById,Integer scstFunds,Integer financialYear,Integer hoaId,Integer workType,Integer ProjSubType,Integer projectId,Integer type) {
+	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getOMWorksTSAgmtBillsDetailedReport(Integer unitId,
+			Integer approvedById, Integer scstFunds, Integer financialYear, Integer hoaId, Integer workType,
+			Integer ProjSubType, Integer projectId, Integer type) {
 		// TODO Auto-generated method stub
 		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
 		List<WorkDetailsViewModel> list = null;
-		
-		if (financialYear > 0 && approvedById == 0 && projectId==0) {
-				if(type==1 || type==3) {//2 = Technical Sanctions, 3= Tender/Agreement Details, 4 = ACtion to be taken, 5=Bills Paid, 6=Bills pending
-				list=workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndUnitId(financialYear,unitId, type);
+
+		if (type == 2 || type == 3) {// 2 = Technical Sanctions, 3= Tender/Agreement Details, 4 = ACtion to be taken,
+										// 5=Bills Paid, 6=Bills pending
+			if (financialYear > 0 && approvedById == 0 && unitId > 0) {
+				list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndUnitIdAndProjectId(financialYear,
+						unitId, type, projectId);
 			}
-			}
+		}
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
-
 
 	@Override
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getOMWorksHoaTSAgmtBillsDetailedReport(Integer unitId,
@@ -183,18 +187,18 @@ BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResp
 		// TODO Auto-generated method stub
 		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
 		List<WorkDetailsViewModel> list = null;
-		
-		if(unitId.equals(0)&& !hoaId.equals(0) && !workTypeId.equals(0) ) {
-			list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndHoaIdAndWorkTypeId(financialYear, hoaId, workTypeId,type);
-	}
+
+		if (unitId.equals(0) && !hoaId.equals(0) && !workTypeId.equals(0)) {
+			list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndHoaIdAndWorkTypeId(financialYear, hoaId,
+					workTypeId, type);
+		}
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
-
 
 	@Override
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getOMWorksSanctionTSAgmtBillsDetailedReport(
@@ -204,45 +208,64 @@ BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResp
 		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
 		List<WorkDetailsViewModel> list = null;
 		if (workTypeId == 0 && approvedById != 0 && hoaId == 0) {
-					list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndApprovedById(financialYear,approvedById,type);
-				}
-				else if(workTypeId != 0 && approvedById == 0 && hoaId == 0) {
-					list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndWorkTypeId(financialYear,workTypeId, type);
-				}else if (workTypeId != 0 && approvedById != 0 && hoaId == 0) {
-					if (approvedById==1 || approvedById==2) {
-						list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndWorkTypeIdAndApprovedById(financialYear,workTypeId,approvedById,type);
-					}else if(approvedById.equals(9999)){
-						list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndWorkTypeIdAndApprovedByIdIn(financialYear,workTypeId,Arrays.asList(3, 4, 5, 6),type);
-					}
-				}
-	
+			list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndApprovedById(financialYear, approvedById,
+					type);
+		} else if (workTypeId != 0 && approvedById == 0 && hoaId == 0) {
+			list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndWorkTypeId(financialYear, workTypeId,
+					type);
+		} else if (workTypeId != 0 && approvedById != 0 && hoaId == 0) {
+			if (approvedById == 1 || approvedById == 2) {
+				list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndWorkTypeIdAndApprovedById(
+						financialYear, workTypeId, approvedById, type);
+			} else if (approvedById.equals(9999)) {
+				list = workdetailsrepo.findworkDetailsViewEntityByFinancialYearAndWorkTypeIdAndApprovedByIdIn(
+						financialYear, workTypeId, Arrays.asList(3, 4, 5, 6), type);
+			}
+		}
+
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		
+
 		return responseJson;
 	}
-
 
 	@Override
 	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getWorkOverViewReport(Integer unitId, Integer circleId,
 			Integer divisionId, Integer subDivisionId) {
 		// TODO Auto-generated method stub
 		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
-		
+
 		List<WorkDetailsViewModel> list = null;
-		
-		list=workdetailsrepo.findWorkOverViewReport();
-		
-		
+
+		list = workdetailsrepo.findWorkOverViewReport();
+
 		responseJson.setSuccess(true);
 		responseJson.setData(list);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
-		//System.out.println("responseJson" +responseJson);
+		// System.out.println("responseJson" +responseJson);
 		return responseJson;
 	}
 
+	@Override
+	public BaseResponse<HttpStatus, List<WorkDetailsViewModel>> getAbsReportProjectUnitWise(Integer finyear,
+			Integer projectId) {
+		// TODO Auto-generated method stub
+		BaseResponse<HttpStatus, List<WorkDetailsViewModel>> responseJson = new BaseResponse<>();
 
+		List<WorkDetailsViewModel> list = null;
+
+		if (finyear > 0) {
+			list = workdetailsrepo.getAbsReportProjectUnitWise(finyear, projectId);
+		}
+		responseJson.setSuccess(true);
+		responseJson.setData(list);
+		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
+		responseJson.setStatus(HttpStatus.OK);
+
+		return responseJson;
 	}
+
+}

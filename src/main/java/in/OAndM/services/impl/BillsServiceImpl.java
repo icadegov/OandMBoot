@@ -51,9 +51,9 @@ public class BillsServiceImpl extends BaseServiceImpl<BillsEntity, BillsModel, I
 		BaseResponse<HttpStatus, List<BillsModel>> responseJson = new BaseResponse<>();
 		List<BillsModel> list = null;
 		
-		if (financialYear > 0 && approvedById == 0 && projectId==0) {
+		if (financialYear > 0 && approvedById == 0 && unitId>0) {
 				if(type==5 || type==6) {//2 = Technical Sanctions, 3= Tender/Agreement Details, 4 = ACtion to be taken, 5=Bills Paid, 6=Bills pending
-				list=billsRepo.findbillsEntityByFinancialYearAndUnitId(financialYear,unitId, type);
+					list=billsRepo.findbillsEntityByFinancialYearAndUnitIdAndProjectId(financialYear,unitId, type,projectId);
 			}
 			}
 		responseJson.setSuccess(true);

@@ -19,8 +19,9 @@ public interface BillsRepo extends  BaseRepository<BillsEntity, Integer>{
 			+ "(:type = 5 AND aa.workId > 0 AND wd.statusId = 6) OR"
 			+ "(:type = 6 AND aa.workId > 0 AND wd.statusId < 6)  "
 			+ ")"
-			+ " and aa.financialYear=:financialYear and aa.unitId=:unitId ")
-	public List<BillsModel> findbillsEntityByFinancialYearAndUnitId(Integer financialYear,Integer unitId, Integer type);
+			+ " and aa.financialYear=:financialYear and aa.unitId=:unitId "
+			+ " AND (:projectId <= 0 OR aa.projectId = :projectId) ")
+	public List<BillsModel> findbillsEntityByFinancialYearAndUnitIdAndProjectId(Integer financialYear,Integer unitId, Integer type, Integer projectId);
 	
 	@Query("SELECT new in.OAndM.DTO.BillsModel( aa.workId as workId, aa.workName as workName, "
 			+ " wd.workDoneAmount as workDoneAmount, wd.billNo as billNo, wd.billType as billType,st.statusName as statusName ,agmt.agreementNumber as agreementNumber, "

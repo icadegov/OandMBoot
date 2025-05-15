@@ -38,8 +38,12 @@ public class TechnicalSanctionServiceImpl extends BaseServiceImpl<TechnicalSanct
 		
 			if(list!=null) {
 				responseJson=saveAll(list);
+				logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 				responseJson.setMessage("Submitted SuccessFully");
+				responseJson.setSuccess(true);
 			}else {
+				logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+				responseJson.setSuccess(false);
 				responseJson.setMessage("Error in Submitting");
 			}
 			return responseJson;
@@ -48,11 +52,11 @@ public class TechnicalSanctionServiceImpl extends BaseServiceImpl<TechnicalSanct
 	
 	
 	public BaseResponse<HttpStatus, List<TechnicalSanctionsModel>>  getTechnicalSanctionByWorkId(Integer workId){
-		logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_STARTED));
+
 		BaseResponse<HttpStatus, List<TechnicalSanctionsModel>> responseJson = new BaseResponse<>();
 
 		
-		
+		try {
 		List<TechnicalSanctionEntity> entities = technicalSanctionRepo.findByAdminSanctionsWorkIdAndIsLatestTrueAndDeleteFlagFalse(workId);
 		List<TechnicalSanctionsModel> techmodels =new ArrayList<>();
 		for(TechnicalSanctionEntity  admin: entities) {
@@ -67,6 +71,14 @@ public class TechnicalSanctionServiceImpl extends BaseServiceImpl<TechnicalSanct
 		responseJson.setData(techmodels);
 		responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_SUCCESS));
 		responseJson.setStatus(HttpStatus.OK);
+		}
+		catch(Exception e) {
+			logger.debug(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setSuccess(false);
+		
+			responseJson.setMessage(appConstant.getValue(AppConstant.GET_SERVICE_FAILED));
+			responseJson.setStatus(HttpStatus.BAD_GATEWAY);
+		}
 		return responseJson;
 		
 	}

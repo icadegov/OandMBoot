@@ -159,7 +159,7 @@ public interface AdminSanctionViewRepo extends BaseRepository<AdminSanctionViewE
 	@Query( "select  new in.OAndM.DTO.AdminSanctionViewModel (financialYear as financialYear,finYear as finYear,"
 			+ "  count(distinct(workId)) as longWorkId,"
 			+ " COALESCE(sum(adminSanctionAmt/ 100000),0) as adminSanctionAmt )"
-			+ " from AdminSanctionViewEntity group by financialYear,finYear order by financialYear")
+			+ " from AdminSanctionViewEntity group by financialYear,finYear order by financialYear desc")
 	public List<AdminSanctionViewModel> findByFinancialYear();
 
 }

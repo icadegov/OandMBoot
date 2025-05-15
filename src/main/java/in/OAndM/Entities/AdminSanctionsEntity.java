@@ -162,6 +162,8 @@ public class AdminSanctionsEntity {
 	  @SQLRestriction("delete_flag = 'false' AND is_latest='true'")
 	  private List<TechnicalSanctionEntity> technEntries;
 	  
+	  
+	  
 //	  @OneToOne(mappedBy = "assignAdminSanction", fetch = FetchType.LAZY) 
 //		private AdminAssignWorksEntity adminAssignWorksEntities ;
 	  

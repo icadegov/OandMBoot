@@ -125,5 +125,8 @@ private long govtSanction;
 	private String authorityType;
 	
 	private Integer type;
+	
+	private Integer projectId;
+	private String projectName;
 
 }
