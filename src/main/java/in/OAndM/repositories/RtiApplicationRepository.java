@@ -12,10 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import in.OAndM.core.BaseRepository;
-import in.OAndM.services.impl.RTIApplicationServiceImpl;
 import in.OAndM.Entities.RTIApplication;
-import in.OAndM.Entities.RtiProformaG;
+import in.OAndM.core.BaseRepository;
 
 
 @Repository

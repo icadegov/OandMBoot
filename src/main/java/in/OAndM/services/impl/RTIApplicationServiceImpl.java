@@ -1,26 +1,5 @@
 package in.OAndM.services.impl;
 
-import in.OAndM.DTO.CircleListForUnitId;
-import in.OAndM.DTO.DivisionListForCircleId;
-import in.OAndM.DTO.RtiApplicationDto;
-import in.OAndM.DTO.RtiProformaGDto;
-import in.OAndM.DTO.UnitLevelDataDto;
-import in.OAndM.DTO.UnitLevelRequest;
-import in.OAndM.DTO.UserDetailsDto;
-import in.OAndM.Entities.RTIApplication;
-import in.OAndM.Entities.RtiProformaG;
-import in.OAndM.mappers.RtiApplicationMapper; // Assuming your mapper exists here
-import in.OAndM.repositories.RtiApplicationRepository;
-import in.OAndM.requests.PaginationRequest;
-import in.OAndM.core.BaseResponse;
-import in.OAndM.services.RTIApplicationService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,8 +13,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import in.OAndM.DTO.CircleListForUnitId;
+import in.OAndM.DTO.DivisionListForCircleId;
+import in.OAndM.DTO.RtiApplicationDto;
+import in.OAndM.DTO.UnitLevelDataDto;
+import in.OAndM.DTO.UserDetailsDto;
+import in.OAndM.Entities.RTIApplication;
+import in.OAndM.core.BaseResponse;
+import in.OAndM.core.BaseServiceImpl;
+import in.OAndM.mappers.RtiApplicationMapper; // Assuming your mapper exists here
+import in.OAndM.repositories.RtiApplicationRepository;
+import in.OAndM.requests.PaginationRequest;
+import in.OAndM.services.RTIApplicationService;
+
 @Service
-public class RTIApplicationServiceImpl implements RTIApplicationService {
+public class RTIApplicationServiceImpl extends BaseServiceImpl<RTIApplication,RtiApplicationDto,Integer> implements RTIApplicationService {
 	private static final Logger log = LoggerFactory.getLogger(RTIApplicationServiceImpl.class);
     private final RtiApplicationRepository rtiApplicationRepository;
     private final RtiApplicationMapper rtiApplicationMapper;
@@ -264,14 +262,14 @@ public class RTIApplicationServiceImpl implements RTIApplicationService {
         // Convert LocalDate to Date
         ZoneId defaultZoneId = ZoneId.systemDefault();
         Date date = Date.from(lastDayInPreviousQuarter.atStartOfDay(defaultZoneId).toInstant());
-        System.out.println("date "+date);
+      //  System.out.println("date "+date);
         Date fdate = Date.from(firstDayInPreviousQuarter.atStartOfDay(defaultZoneId).toInstant());
-        System.out.println("fdate "+fdate);
+       // System.out.println("fdate "+fdate);
 
         log.info("Fetching EE edit data for quarter desgId: {}, divId: {}, circleId: {}, unitId: {},fdate: {},date: {}",desgId,divId,circleId,unitId,fdate,date);
         List<UnitLevelDataDto> unitLevelData=new ArrayList<>(); 
         List<Map<String, Object>> rawData = rtiApplicationRepository.getRTIAppnRegisterEntryListEE(desgId,divId,circleId,unitId,fdate,date);
-        System.out.println("rawData "+rawData);
+       // System.out.println("rawData "+rawData);
         if (rawData == null || rawData.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND);
             response.setMessage("No records found to display");
@@ -284,16 +282,16 @@ public class RTIApplicationServiceImpl implements RTIApplicationService {
        if(rawData.size()>0) {
     	   for (int i = 0; i < rawData.size(); i++) {
     		    Map<String, Object> row = rawData.get(i);
-    		    System.out.println("Row " + i + ": " + row);
+    		   // System.out.println("Row " + i + ": " + row);
 
     		    for (Map.Entry<String, Object> entry : row.entrySet()) {
-    		        System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+    		       // System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
     		    }
     	   }
        for(int i=0;i<rawData.size();i++) {
     	   RtiApplicationDto dto = new RtiApplicationDto();
     	   Map<String, Object> row = rawData.get(i);
-    	    System.out.println("Row " + i + ": " + row);
+    	  //  System.out.println("Row " + i + ": " + row);
        	dto.setApplicationId(Integer.parseInt(rawData.get(i).get(("application_id")).toString()));     	
            
        	
@@ -820,17 +818,17 @@ public class RTIApplicationServiceImpl implements RTIApplicationService {
 	        List<Map<String, Object>> rawData = null;
 	        if (unit != 4) {
 	            if (u.getDesignationId() == 12 || u.getDesignationId() == 7||u.getDesignationId() == 9||u.getDesignationId() == 10) {
-	            	  System.out.println("unit not 4 and desg ! =5 "+unit);
+	            	  //System.out.println("unit not 4 and desg ! =5 "+unit);
 	            	 log.info("Fetching drill down division data unit not 4 desg not 5 ", unit);
 	            	  
 	                rawData = rtiApplicationRepository.getrtiAppnDivisionUCConsolidatedProformaC(year, quarter, timestamp, unit, circle);
 	            } else if (u.getDesignationId() == 5) {
-	            	  System.out.println("unit not 4 and desg =5 "+unit);
+	            	  //System.out.println("unit not 4 and desg =5 "+unit);
 	            	 log.info("Fetching drill down division data unit not 4 desg 5", unit);
 	                rawData = rtiApplicationRepository.getrtiAppnDivisionUCDConsolidatedProformaC(year, quarter, timestamp, unit, circle, division);
 	            }
 	        } else {
-	        	  System.out.println("unit =4 "+unit);
+	        	  //System.out.println("unit =4 "+unit);
 	        	  log.info("Fetching drill down division data unit 4", unit);
 	        	  unit=clickedUnitId;
 	        	  circle=clickedCircleId;
@@ -1055,7 +1053,7 @@ public class RTIApplicationServiceImpl implements RTIApplicationService {
            // int qtr = rtiar.getQuarter();
             int month = getMonthForQuarter(quarter);
             Integer unit = user.getUnitId();
-            System.out.println("unit CE dashboard"+unit);
+           // System.out.println("unit CE dashboard"+unit);
             // Calculate the last day of the previous quarter
             LocalDate currentQuarterDate = LocalDate.of(year, month, 1);
             LocalDate previousQuarter = currentQuarterDate.minus(1, IsoFields.QUARTER_YEARS);

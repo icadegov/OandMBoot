@@ -1,25 +1,5 @@
 package in.OAndM.services.impl;
 
-import in.OAndM.DTO.CircleListForUnitId;
-import in.OAndM.DTO.DivisionListForCircleId;
-import in.OAndM.DTO.RtiApplicationDto;
-import in.OAndM.DTO.RtiProformaGDto;
-import in.OAndM.DTO.UnitLevelDataDto;
-import in.OAndM.DTO.UnitLevelRequest;
-import in.OAndM.DTO.UserDetailsDto;
-import in.OAndM.Entities.RtiProformaG;
-import in.OAndM.mappers.RtiProformaGMapper;
-import in.OAndM.repositories.RtiProformaGRepository;
-import in.OAndM.requests.PaginationRequest;
-import in.OAndM.core.BaseResponse;
-import in.OAndM.services.RtiProformaGService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,10 +12,28 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import in.OAndM.DTO.CircleListForUnitId;
+import in.OAndM.DTO.DivisionListForCircleId;
+import in.OAndM.DTO.RtiProformaGDto;
+import in.OAndM.DTO.UnitLevelDataDto;
+import in.OAndM.DTO.UserDetailsDto;
+import in.OAndM.Entities.RtiProformaG;
+import in.OAndM.core.BaseResponse;
+import in.OAndM.core.BaseServiceImpl;
+import in.OAndM.mappers.RtiProformaGMapper;
+import in.OAndM.repositories.RtiProformaGRepository;
+import in.OAndM.requests.PaginationRequest;
+import in.OAndM.services.RtiProformaGService;
 
 @Service
-public class RtiProformaGServiceImpl implements RtiProformaGService {
+public class RtiProformaGServiceImpl extends BaseServiceImpl<RtiProformaG,RtiProformaGDto,Integer> implements RtiProformaGService {
 	
 	private static final Logger log = LoggerFactory.getLogger(RtiProformaGServiceImpl.class);
     private final RtiProformaGRepository rtiProformaGRepository;
@@ -414,7 +412,7 @@ public class RtiProformaGServiceImpl implements RtiProformaGService {
         log.info("Fetching EE edit data for quarter desgId: {}, divId: {}, circleId: {}, unitId: {},fdate: {},date: {}",desgId,divId,circleId,unitId,fdate,date);
         List<UnitLevelDataDto> unitLevelData=new ArrayList<>(); 
         List<Map<String, Object>> rawData = rtiProformaGRepository.getRTIAppealEditList(divId,circleId,unitId,fdate,date);
-        System.out.println("rawData "+rawData);
+       // System.out.println("rawData "+rawData);
 
         if (rawData == null || rawData.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND);
@@ -533,12 +531,18 @@ public class RtiProformaGServiceImpl implements RtiProformaGService {
        //System.out.println("fdate "+fdate);
 
        log.info("Fetching EE edit data for quarter desgId: {}, divId: {}, circleId: {}, unitId: {},year: {},Qtr: {}",desg,div,circle,unit,year,Quarter);
-       System.out.println("rawData "+rawData);
+      // System.out.println("rawData "+rawData);
 
-      
+       if (rawData == null || rawData.isEmpty()) {
+           response.setStatus(HttpStatus.NOT_FOUND);
+           response.setMessage("No records found to display");
+           response.setData(null);
+           return response;
+       }
      	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
      	
-      List<RtiProformaGDto> rtiEdit=new ArrayList<>(); 
+      List<RtiProformaGDto> rtiEdit=new ArrayList<>();
+      if(rawData.size()>0) {
       for(int i=0;i<rawData.size();i++) {
    	   RtiProformaGDto dto = new RtiProformaGDto();  
    	   
@@ -597,7 +601,7 @@ public class RtiProformaGServiceImpl implements RtiProformaGService {
       response.setMessage("Rti Appeal edit data List retrieved successfully.");
       response.setData(rtiEdit);
       response.setSuccess(true);
-  } catch (IllegalArgumentException e) {
+  }} catch (IllegalArgumentException e) {
       log.error("Validation error: {}", e.getMessage());
       response.setStatus(HttpStatus.BAD_REQUEST);
       response.setMessage(e.getMessage());
